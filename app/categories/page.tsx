@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     title: 'All Categories - Crypto Earning Opportunities | AirdropFinder',
     description: 'Browse all categories of crypto earning opportunities including airdrops, faucets, learn-to-earn, and more.',
     type: 'website',
-    url: 'https://airdropfinder.vercel.app/categories',
+    url: 'https://airdropfinders.vercel.app/categories',
   },
   twitter: {
     card: 'summary_large_image',

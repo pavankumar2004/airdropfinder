@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     title: 'All Platforms - Crypto Earning Opportunities | AirdropFinder',
     description: 'Browse all crypto earning platforms including airdrops, faucets, learn-to-earn, and more. Find the best opportunities to earn cryptocurrency rewards.',
     type: 'website',
-    url: 'https://airdropfinder.vercel.app/platforms',
+    url: 'https://airdropfinders.vercel.app/platforms',
   },
   twitter: {
     card: 'summary_large_image',

@@ -1,6 +1,6 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-  siteUrl: process.env.SITE_URL || 'https://airdropfinder.vercel.app',
+  siteUrl: process.env.SITE_URL || 'https://airdropfinders.vercel.app',
   generateRobotsTxt: true,
   robotsTxtOptions: {
     policies: [
@@ -10,8 +10,8 @@ module.exports = {
       },
     ],
     additionalSitemaps: [
-      'https://airdropfinder.vercel.app/sitemap.xml',
-      'https://airdropfinder.vercel.app/server-sitemap.xml',
+      'https://airdropfinders.vercel.app/sitemap.xml',
+      'https://airdropfinders.vercel.app/server-sitemap.xml',
     ],
   },
   exclude: ['/admin', '/admin/*'],

@@ -84,7 +84,7 @@ export async function generateMetadata(props: { params: { slug: string } }): Pro
       title: category.title,
       description: category.description,
       type: 'website',
-      url: `https://airdropfinder.vercel.app/category/${slug}`,
+      url: `https://airdropfinders.vercel.app/category/${slug}`,
     },
     twitter: {
       card: 'summary_large_image',

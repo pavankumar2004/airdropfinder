@@ -8,7 +8,7 @@ export async function GET() {
 
   // Generate platform URLs
   const platformUrls: ISitemapField[] = platforms.map((platform) => ({
-    loc: `https://airdropfinder.vercel.app/platform/${platform.slug}`,
+    loc: `https://airdropfinders.vercel.app/platform/${platform.slug}`,
     lastmod: new Date(platform.updatedAt?.toDate() || new Date()).toISOString(),
     changefreq: 'weekly' as const,
     priority: 0.8,
@@ -27,7 +27,7 @@ export async function GET() {
   ];
 
   const categoryUrls: ISitemapField[] = categories.map((category) => ({
-    loc: `https://airdropfinder.vercel.app/category/${category}`,
+    loc: `https://airdropfinders.vercel.app/category/${category}`,
     lastmod: new Date().toISOString(),
     changefreq: 'weekly' as const,
     priority: 0.7,

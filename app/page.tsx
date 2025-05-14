@@ -34,7 +34,11 @@ const categories = [
 async function getTopPlatforms(): Promise<Platform[]> {
   try {
     const platforms = await getPlatforms();
-    return platforms.slice(0, 6); // Return top 6 platforms
+    // Filter out any platforms with name "airdrop" (case insensitive)
+    const filteredPlatforms = platforms.filter(platform => 
+      !platform.name.toLowerCase().includes('airdrop')
+    );
+    return filteredPlatforms.slice(0, 6); // Return top 6 platforms
   } catch (error) {
     console.error("Error fetching platforms:", error);
     return []; // Return empty array if there's an error

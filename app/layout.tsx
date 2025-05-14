@@ -19,11 +19,11 @@ export const metadata: Metadata = {
   title: "AirdropFinder - Discover the Best Crypto Airdrops & Earning Opportunities",
   description: "Find the latest crypto airdrops, faucets, and earn opportunities. Compare rewards and maximize your crypto earnings with our comprehensive directory.",
   keywords: "crypto airdrops, free crypto, earn crypto, faucets, learn to earn, crypto rewards",
-  metadataBase: new URL('https://airdropfinder.vercel.app'),
+  metadataBase: new URL('https://airdropfinders.vercel.app'),
   openGraph: {
     title: "AirdropFinder - Discover the Best Crypto Airdrops & Earning Opportunities",
     description: "Find the latest crypto airdrops, faucets, and earn opportunities. Compare rewards and maximize your crypto earnings with our comprehensive directory.",
-    url: 'https://airdropfinder.vercel.app',
+    url: 'https://airdropfinders.vercel.app',
     siteName: 'AirdropFinder',
     images: [
       {

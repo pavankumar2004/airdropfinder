@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     title: 'About AirdropFinder - Crypto Earning Opportunities Directory',
     description: 'Learn about AirdropFinder, the comprehensive directory for crypto earning opportunities including airdrops, faucets, and learn-to-earn platforms.',
     type: 'website',
-    url: 'https://airdropfinder.vercel.app/about',
+    url: 'https://airdropfinders.vercel.app/about',
   },
   twitter: {
     card: 'summary_large_image',

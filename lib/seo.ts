@@ -45,7 +45,7 @@ export function generateMetaTags(platform: Platform) {
       title: platform.seoTitle || `${platform.name} - Earn ${platform.rewardType} | AirdropFinder`,
       description: platform.seoDescription || `Learn how to earn ${platform.estimatedEarning} with ${platform.name}, a ${platform.category} platform offering ${platform.rewardType} rewards.`,
       type: 'website',
-      url: `https://airdropfinder.vercel.app/platform/${platform.slug}`,
+      url: `https://airdropfinders.vercel.app/platform/${platform.slug}`,
       images: [
         {
           url: platform.logoUrl,
