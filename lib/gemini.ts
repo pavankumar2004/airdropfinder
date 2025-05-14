@@ -6,7 +6,10 @@ const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY || '
 
 export async function generatePlatformContent(platform: Platform) {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    // Update to use the newer model
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    
+    console.log('Using Gemini API with key:', process.env.NEXT_PUBLIC_GEMINI_API_KEY?.substring(0, 5) + '...');
 
     const prompt = `
     Generate a comprehensive article about ${platform.name}, which is a ${platform.category} platform.
