@@ -29,9 +29,9 @@ const rewardTypes = [
   'Mixed'
 ];
 
-export default function EditPlatformPage({ params }: { params: { id: string } }) {
+export default function EditPlatformPage(props: { params: { id: string } }) {
   const router = useRouter();
-  const { id } = params;
+  const id = String(props.params.id);
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
