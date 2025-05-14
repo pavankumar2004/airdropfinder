@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   description: "Find the latest crypto airdrops, faucets, and earn opportunities. Compare rewards and maximize your crypto earnings with our comprehensive directory.",
   keywords: "crypto airdrops, free crypto, earn crypto, faucets, learn to earn, crypto rewards",
   metadataBase: new URL('https://airdropfinders.vercel.app'),
+  verification: {
+    google: 'b-bFhmt-Igzr-GuaraRLFWRbo-dtyIP1I05a0kg74ZQ',
+  },
   openGraph: {
     title: "AirdropFinder - Discover the Best Crypto Airdrops & Earning Opportunities",
     description: "Find the latest crypto airdrops, faucets, and earn opportunities. Compare rewards and maximize your crypto earnings with our comprehensive directory.",
