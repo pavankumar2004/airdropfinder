@@ -2,15 +2,13 @@ import {
   collection, 
   doc, 
   getDocs, 
-  getDoc, 
   addDoc, 
   updateDoc, 
   deleteDoc, 
   query, 
   where,
   orderBy,
-  serverTimestamp,
-  DocumentData
+  serverTimestamp
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { Platform, GeneratedContent } from '../types';
@@ -101,9 +99,17 @@ export const updateGeneratedContent = async (id: string, content: Partial<Omit<G
 };
 
 // Categories
-export const getCategories = async (): Promise<any[]> => {
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  [key: string]: any; // For other potential properties
+}
+
+export const getCategories = async (): Promise<Category[]> => {
   const categoriesRef = collection(db, 'categories');
   const q = query(categoriesRef, orderBy('name', 'asc'));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Category));
 };

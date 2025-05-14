@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { collection, query, where, getDocs, orderBy, limit, startAfter, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { collection, query, where, orderBy, getDocs, limit, startAfter, QueryDocumentSnapshot, QueryConstraint, DocumentData } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { Platform } from '../../types';
 
@@ -55,8 +55,8 @@ export default function SearchPage() {
       }
       
       // Base query
-      let platformsRef = collection(db, 'platforms');
-      let constraints: any[] = [];
+      const platformsRef = collection(db, 'platforms');
+      const constraints: Array<QueryConstraint> = [];
       
       // Add filters
       if (selectedCategory) {
@@ -78,7 +78,7 @@ export default function SearchPage() {
       }
       
       // Create query
-      let q = query(platformsRef, ...constraints);
+      const q = query(platformsRef, ...constraints);
       
       // Execute query
       const snapshot = await getDocs(q);
@@ -145,7 +145,7 @@ export default function SearchPage() {
   // Initial search on page load or when filters change
   useEffect(() => {
     searchPlatforms();
-  }, [selectedCategory, selectedRewardType]);
+  }, [selectedCategory, selectedRewardType, searchPlatforms]);
 
   return (
     <div className="bg-white">

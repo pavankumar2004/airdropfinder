@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 // Add type declaration for gtag
 declare global {
   interface Window {
-    gtag: (command: string, target: string, params?: any) => void;
+    gtag: (command: string, target: string, params?: Record<string, unknown>) => void;
   }
 }
 

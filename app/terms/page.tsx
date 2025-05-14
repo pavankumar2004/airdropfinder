@@ -47,12 +47,12 @@ export default function TermsPage() {
               In these terms and conditions, "User Content" shall mean any audio, video, text, images or other material you choose to display on this website. By displaying your User Content, you grant AirdropFinder a non-exclusive, worldwide, irrevocable, royalty-free, sublicensable license to use, reproduce, adapt, publish, translate and distribute it in any and all media.
             </p>
             <p>
-              Your User Content must be your own and must not be infringing on any third party's rights. AirdropFinder reserves the right to remove any of your content from this website at any time without notice.
+              Your User Content must be your own and must not be infringing on any third party&apos;s rights. AirdropFinder reserves the right to remove any of your content from this website at any time without notice.
             </p>
             
             <h2>No Warranties</h2>
             <p>
-              This website is provided "as is," with all faults, and AirdropFinder makes no express or implied representations or warranties, of any kind related to this website or the materials contained on this website.
+              This website is provided &quot;as is,&quot; with all faults, and AirdropFinder makes no express or implied representations or warranties, of any kind related to this website or the materials contained on this website.
             </p>
             <p>
               Additionally, nothing contained on this website shall be construed as providing advice to you. The information provided on platforms listed in our directory is for general informational purposes only and should not be considered financial advice.
@@ -68,7 +68,7 @@ export default function TermsPage() {
             
             <h2>Indemnification</h2>
             <p>
-              You hereby indemnify to the fullest extent AirdropFinder from and against any and all liabilities, costs, demands, causes of action, damages and expenses (including reasonable attorney's fees) arising out of or in any way related to your breach of any of the provisions of these terms.
+              You hereby indemnify to the fullest extent AirdropFinder from and against any and all liabilities, costs, demands, causes of action, damages and expenses (including reasonable attorney&apos;s fees) arising out of or in any way related to your breach of any of the provisions of these terms.
             </p>
             
             <h2>Severability</h2>
