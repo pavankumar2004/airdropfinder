@@ -21,6 +21,8 @@ export default function Footer() {
         <div className="mt-8 md:order-1 md:mt-0">
           <p className="text-center text-xs leading-5 text-gray-500">
             &copy; {new Date().getFullYear()} AirdropFinder. All rights reserved.
+            <br />
+            Developed by <a href="https://github.com/pavankumar2004/airdropfinder" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-500">Pavan</a>
           </p>
         </div>
       </div>

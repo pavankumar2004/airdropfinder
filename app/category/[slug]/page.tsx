@@ -65,8 +65,9 @@ const categoryInfo = {
 };
 
 // Generate metadata for the category page
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { slug } = params;
+export async function generateMetadata(props: { params: { slug: string } }): Promise<Metadata> {
+  // Use a different approach to avoid the params error
+  const slug = String(props.params.slug);
   const category = categoryInfo[slug as keyof typeof categoryInfo];
   
   if (!category) {
@@ -93,8 +94,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function CategoryPage({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+export default async function CategoryPage(props: { params: { slug: string } }) {
+  // Use a different approach to avoid the params error
+  const slug = String(props.params.slug);
   const category = categoryInfo[slug as keyof typeof categoryInfo];
   
   if (!category) {

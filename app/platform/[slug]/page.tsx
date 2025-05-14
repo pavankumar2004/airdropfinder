@@ -6,8 +6,9 @@ import { getPlatformBySlug, getGeneratedContent } from '../../../lib/firestore';
 import { generateStructuredData, generateMetaTags } from '../../../lib/seo';
 
 // Generate metadata for the platform page
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const platform = await getPlatformBySlug(params.slug);
+export async function generateMetadata(props: { params: { slug: string } }): Promise<Metadata> {
+  const slug = String(props.params.slug);
+  const platform = await getPlatformBySlug(slug);
   
   if (!platform) {
     return {
@@ -19,8 +20,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return generateMetaTags(platform);
 }
 
-export default async function PlatformPage({ params }: { params: { slug: string } }) {
-  const platform = await getPlatformBySlug(params.slug);
+export default async function PlatformPage(props: { params: { slug: string } }) {
+  const slug = String(props.params.slug);
+  const platform = await getPlatformBySlug(slug);
   
   if (!platform) {
     notFound();
