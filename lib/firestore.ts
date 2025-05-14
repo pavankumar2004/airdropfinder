@@ -104,7 +104,7 @@ interface Category {
   name: string;
   slug: string;
   description?: string;
-  [key: string]: any; // For other potential properties
+  [key: string]: string | number | boolean | undefined; // For other potential properties
 }
 
 export const getCategories = async (): Promise<Category[]> => {

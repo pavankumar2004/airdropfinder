@@ -29,7 +29,7 @@ export default function ContactPage() {
               Get in touch with us
             </h2>
             <p className="mt-6 text-lg leading-8 text-gray-300">
-              Have questions about AirdropFinder? Want to suggest a new platform or report an issue? We're here to help!
+              Have questions about AirdropFinder? Want to suggest a new platform or report an issue? We&apos;re here to help!
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
               <a

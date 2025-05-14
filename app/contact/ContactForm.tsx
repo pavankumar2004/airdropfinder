@@ -40,7 +40,7 @@ export default function ContactForm() {
         subject: '',
         message: '',
       });
-    } catch (err) {
+    } catch (_) {
       setError('There was an error submitting your message. Please try again.');
     } finally {
       setSubmitting(false);
@@ -52,7 +52,7 @@ export default function ContactForm() {
       <div className="mx-auto max-w-2xl text-center">
         <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Contact Us</h2>
         <p className="mt-2 text-lg leading-8 text-gray-600">
-          We'd love to hear from you! Send us a message using the form below.
+          We&apos;d love to hear from you! Send us a message using the form below.
         </p>
       </div>
       
@@ -68,7 +68,7 @@ export default function ContactForm() {
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-green-800">Message sent successfully</h3>
                 <div className="mt-2 text-sm text-green-700">
-                  <p>Thank you for contacting us! We'll get back to you as soon as possible.</p>
+                  <p>Thank you for contacting us! We&apos;ll get back to you as soon as possible.</p>
                 </div>
                 <div className="mt-4">
                   <div className="-mx-2 -my-1.5 flex">

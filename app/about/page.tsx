@@ -67,7 +67,7 @@ export default function AboutPage() {
             
             <h2>Contact Us</h2>
             <p>
-              Have questions, suggestions, or want to list your platform? We'd love to hear from you!
+              Have questions, suggestions, or want to list your platform? We&apos;d love to hear from you!
             </p>
             <p>
               <Link href="/contact" className="text-indigo-600 hover:text-indigo-500">

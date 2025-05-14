@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -42,8 +42,8 @@ export default function SearchPage() {
     'Mixed'
   ];
 
-  // Search function
-  const searchPlatforms = async (isNewSearch = true) => {
+  // Search function wrapped in useCallback to prevent dependency changes on every render
+  const searchPlatforms = useCallback(async (isNewSearch = true) => {
     try {
       setLoading(true);
       setError(null);
@@ -118,7 +118,7 @@ export default function SearchPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedCategory, selectedRewardType]);
 
   // Handle search form submission
   const handleSearch = (e: React.FormEvent) => {
