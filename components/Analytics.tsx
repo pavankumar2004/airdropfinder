@@ -2,7 +2,7 @@
 
 import Script from 'next/script';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 
 // Add type declaration for gtag
 declare global {
@@ -11,11 +11,11 @@ declare global {
   }
 }
 
-// This component handles analytics integration (Google Analytics or Plausible)
-export function Analytics() {
+// Inner component that uses useSearchParams
+function AnalyticsContent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-
+  
   useEffect(() => {
     if (pathname && window.gtag) {
       const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : '');
@@ -24,7 +24,12 @@ export function Analytics() {
       });
     }
   }, [pathname, searchParams]);
+  
+  return null;
+}
 
+// This component handles analytics integration (Google Analytics or Plausible)
+export function Analytics() {
   return (
     <>
       {/* Google Analytics Script */}
@@ -48,10 +53,13 @@ export function Analytics() {
               `,
             }}
           />
+          <Suspense fallback={null}>
+            <AnalyticsContent />
+          </Suspense>
         </>
       )}
-
-      {/* Plausible Analytics (Alternative) */}
+      
+      {/* Plausible Analytics Script */}
       {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
         <Script
           strategy="afterInteractive"
