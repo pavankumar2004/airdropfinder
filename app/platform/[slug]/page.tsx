@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getPlatformBySlug, getGeneratedContent } from '../../../lib/firestore';
+import { getPlatformBySlug } from '../../../lib/firestore';
 import { generateStructuredData, generateMetaTags } from '../../../lib/seo';
 
 // Generate metadata for the platform page
@@ -28,8 +28,8 @@ export default async function PlatformPage(props: { params: { slug: string } }) 
     notFound();
   }
   
-  const content = await getGeneratedContent(platform.id);
-  const structuredData = generateStructuredData(platform, content || undefined);
+  // Use the platform's manually entered content instead of AI-generated content
+  const structuredData = generateStructuredData(platform);
   
   return (
     <div className="bg-white">
@@ -103,56 +103,66 @@ export default async function PlatformPage(props: { params: { slug: string } }) 
           {/* Main content */}
           <div className="lg:col-span-2">
             <div className="prose prose-indigo max-w-none">
-              {/* Introduction */}
-              <h2 className="text-2xl font-bold tracking-tight text-gray-900">Introduction</h2>
+              {/* Project Info */}
+              <h2 className="text-2xl font-bold tracking-tight text-gray-900">What is {platform.name}?</h2>
               <div className="mt-4 text-gray-600">
-                {content?.intro || platform.description}
+                {platform.projectInfo || platform.description}
               </div>
               
-              {/* How it works */}
-              <h2 className="mt-12 text-2xl font-bold tracking-tight text-gray-900">How It Works</h2>
+              {/* Airdrop Details */}
+              <h2 className="mt-12 text-2xl font-bold tracking-tight text-gray-900">{platform.name} Airdrop Details</h2>
               <div className="mt-4 text-gray-600">
-                {content?.howItWorks || 'Information about how this platform works will be available soon.'}
+                {platform.airdropDetails || 'Information about this airdrop will be available soon.'}
               </div>
               
-              {/* Pros and Cons */}
-              <h2 className="mt-12 text-2xl font-bold tracking-tight text-gray-900">Pros and Cons</h2>
-              <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <div className="rounded-lg bg-green-50 p-6">
-                  <h3 className="text-base font-semibold leading-7 text-green-900">Pros</h3>
-                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-green-800">
-                    {content?.prosAndCons?.pros?.map((pro, index) => (
-                      <li key={index}>{pro}</li>
-                    )) || (
-                      <>
-                        <li>Easy to use interface</li>
-                        <li>Legitimate rewards</li>
-                        <li>Regular payouts</li>
-                      </>
-                    )}
-                  </ul>
+              {/* Participation Guide */}
+              <h2 className="mt-12 text-2xl font-bold tracking-tight text-gray-900">Step-by-Step Guide: How to Participate</h2>
+              <div className="mt-4">
+                <ol className="list-decimal pl-5 space-y-2 text-gray-600">
+                  {platform.participationGuide && platform.participationGuide.length > 0 ? (
+                    platform.participationGuide.map((step, index) => (
+                      <li key={index}>{step}</li>
+                    ))
+                  ) : (
+                    <li>Visit the platform website to get started.</li>
+                  )}
+                </ol>
+              </div>
+              
+              {/* Earning Methods */}
+              <h2 className="mt-12 text-2xl font-bold tracking-tight text-gray-900">Earning Methods for {platform.rewardType}</h2>
+              
+              {/* Content Scouting */}
+              {platform.earningMethods?.contentScouting && (
+                <div className="mt-6">
+                  <h3 className="text-xl font-semibold text-gray-900">Content Scouting:</h3>
+                  <div className="mt-2 text-gray-600">{platform.earningMethods.contentScouting}</div>
                 </div>
-                <div className="rounded-lg bg-red-50 p-6">
-                  <h3 className="text-base font-semibold leading-7 text-red-900">Cons</h3>
-                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-red-800">
-                    {content?.prosAndCons?.cons?.map((con, index) => (
-                      <li key={index}>{con}</li>
-                    )) || (
-                      <>
-                        <li>May require significant time investment</li>
-                        <li>Rewards can vary</li>
-                        <li>Some features may be limited</li>
-                      </>
-                    )}
-                  </ul>
-                </div>
-              </div>
+              )}
               
-              {/* Estimated Earnings */}
-              <h2 className="mt-12 text-2xl font-bold tracking-tight text-gray-900">Estimated Earnings</h2>
-              <div className="mt-4 text-gray-600">
-                {content?.estimatedEarnings || `Users can expect to earn approximately ${platform.estimatedEarning} depending on activity level and engagement.`}
-              </div>
+              {/* Content Creation */}
+              {platform.earningMethods?.contentCreation && (
+                <div className="mt-6">
+                  <h3 className="text-xl font-semibold text-gray-900">Content Creation:</h3>
+                  <div className="mt-2 text-gray-600">{platform.earningMethods.contentCreation}</div>
+                </div>
+              )}
+              
+              {/* Self Scouting */}
+              {platform.earningMethods?.selfScouting && (
+                <div className="mt-6">
+                  <h3 className="text-xl font-semibold text-gray-900">Self Scouting:</h3>
+                  <div className="mt-2 text-gray-600">{platform.earningMethods.selfScouting}</div>
+                </div>
+              )}
+              
+              {/* Project Mission */}
+              {platform.projectMission && (
+                <>
+                  <h2 className="mt-12 text-2xl font-bold tracking-tight text-gray-900">Mission</h2>
+                  <div className="mt-4 text-gray-600">{platform.projectMission}</div>
+                </>
+              )}
             </div>
           </div>
           
@@ -189,12 +199,29 @@ export default async function PlatformPage(props: { params: { slug: string } }) 
               )}
             </div>
             
+            {/* Social Requirements */}
+            {platform.socialRequirements && platform.socialRequirements.length > 0 && (
+              <div className="mt-8 rounded-lg bg-gray-50 p-6 shadow-sm">
+                <h3 className="text-base font-semibold leading-7 text-gray-900">Social Requirements</h3>
+                <ul className="mt-4 space-y-2 text-sm text-gray-600">
+                  {platform.socialRequirements.map((req, index) => (
+                    <li key={index} className="flex items-center">
+                      <svg className="h-5 w-5 text-indigo-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {req}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            
             {/* FAQ */}
-            {content?.faq && content.faq.length > 0 && (
+            {platform.faqs && platform.faqs.length > 0 && (
               <div className="mt-8 rounded-lg bg-gray-50 p-6 shadow-sm">
                 <h3 className="text-base font-semibold leading-7 text-gray-900">Frequently Asked Questions</h3>
                 <dl className="mt-4 space-y-6">
-                  {content.faq.map((item, index) => (
+                  {platform.faqs.map((item, index) => (
                     <div key={index}>
                       <dt className="text-sm font-medium leading-6 text-gray-900">{item.question}</dt>
                       <dd className="mt-1 text-sm leading-6 text-gray-600">{item.answer}</dd>

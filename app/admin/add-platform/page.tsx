@@ -4,8 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { addPlatform } from '../../../lib/firestore';
-import { generatePlatformContent } from '../../../lib/gemini';
-import { addGeneratedContent } from '../../../lib/firestore';
+import { Platform } from '../../../types';
 
 const categories = [
   'Airdrops',
@@ -33,7 +32,6 @@ export default function AddPlatformPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [generateContent, setGenerateContent] = useState(true);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -45,7 +43,18 @@ export default function AddPlatformPage() {
     estimatedEarning: '',
     referralLink: '',
     seoTitle: '',
-    seoDescription: ''
+    seoDescription: '',
+    projectInfo: '',
+    airdropDetails: '',
+    participationGuide: [''],
+    earningMethods: {
+      contentScouting: '',
+      contentCreation: '',
+      selfScouting: ''
+    },
+    projectMission: '',
+    faqs: [{ question: '', answer: '' }],
+    socialRequirements: ['']
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -59,10 +68,87 @@ export default function AddPlatformPage() {
         name: value,
         slug
       });
+    } else if (name.includes('.')) {
+      // Handle nested objects like earningMethods.contentScouting
+      const [parent, child] = name.split('.');
+      
+      if (parent === 'earningMethods') {
+        setFormData({
+          ...formData,
+          earningMethods: {
+            ...formData.earningMethods,
+            [child]: value
+          }
+        });
+      } else {
+        // Generic fallback for other potential nested objects
+        const updatedFormData = { ...formData };
+        const parentObj = updatedFormData[parent as keyof typeof formData];
+        if (typeof parentObj === 'object' && parentObj !== null) {
+          (updatedFormData[parent as keyof typeof formData] as any)[child] = value;
+          setFormData(updatedFormData);
+        }
+      }
     } else {
       setFormData({
         ...formData,
         [name]: value
+      });
+    }
+  };
+  
+  // Handle array fields
+  const handleArrayChange = (index: number, field: string, value: string) => {
+    if (field === 'participationGuide' || field === 'socialRequirements') {
+      const newArray = [...formData[field as 'participationGuide' | 'socialRequirements']];
+      newArray[index] = value;
+      setFormData({
+        ...formData,
+        [field]: newArray
+      });
+    }
+  };
+  
+  // Handle FAQ changes
+  const handleFaqChange = (index: number, field: 'question' | 'answer', value: string) => {
+    const newFaqs = [...formData.faqs];
+    newFaqs[index][field] = value;
+    setFormData({
+      ...formData,
+      faqs: newFaqs
+    });
+  };
+  
+  // Add new item to array fields
+  const addArrayItem = (field: 'participationGuide' | 'socialRequirements' | 'faqs') => {
+    if (field === 'faqs') {
+      setFormData({
+        ...formData,
+        faqs: [...formData.faqs, { question: '', answer: '' }]
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [field]: [...formData[field], '']
+      });
+    }
+  };
+  
+  // Remove item from array fields
+  const removeArrayItem = (field: 'participationGuide' | 'socialRequirements' | 'faqs', index: number) => {
+    if (field === 'faqs') {
+      const newFaqs = [...formData.faqs];
+      newFaqs.splice(index, 1);
+      setFormData({
+        ...formData,
+        faqs: newFaqs.length ? newFaqs : [{ question: '', answer: '' }]
+      });
+    } else {
+      const newArray = [...formData[field]];
+      newArray.splice(index, 1);
+      setFormData({
+        ...formData,
+        [field]: newArray.length ? newArray : ['']
       });
     }
   };
@@ -74,37 +160,46 @@ export default function AddPlatformPage() {
     
     try {
       // Validate required fields
-      const requiredFields = ['name', 'slug', 'category', 'description', 'rewardType', 'estimatedEarning'];
+      const requiredFields = ['name', 'slug', 'category', 'description', 'rewardType', 'estimatedEarning', 'projectInfo', 'airdropDetails'];
       for (const field of requiredFields) {
         if (!formData[field as keyof typeof formData]) {
           throw new Error(`${field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')} is required`);
         }
       }
       
-      // Add platform to Firestore
-      const platformId = await addPlatform(formData);
-      
-      // Generate content with Gemini if option is selected
-      if (generateContent) {
-        try {
-          const platform = {
-            id: platformId,
-            ...formData
-          };
-          
-          const generatedContent = await generatePlatformContent(platform);
-          
-          if (generatedContent) {
-            await addGeneratedContent({
-              platformId,
-              ...generatedContent
-            });
-          }
-        } catch (contentError) {
-          console.error('Error generating content:', contentError);
-          // Continue even if content generation fails
-        }
+      // Validate array fields have at least one non-empty item
+      const participationGuide = formData.participationGuide as string[];
+      if (!participationGuide.some(item => item.trim() !== '')) {
+        throw new Error('At least one participation guide step is required');
       }
+      
+      const faqs = formData.faqs as {question: string, answer: string}[];
+      if (!faqs.some(faq => faq.question.trim() !== '' && faq.answer.trim() !== '')) {
+        throw new Error('At least one FAQ is required');
+      }
+      
+      // Add platform to Firestore
+      // Explicitly cast formData to the expected type to avoid spread type errors
+      const platformData: Omit<Platform, 'id' | 'createdAt' | 'updatedAt'> = {
+        name: formData.name,
+        slug: formData.slug,
+        category: formData.category,
+        logoUrl: formData.logoUrl,
+        description: formData.description,
+        rewardType: formData.rewardType,
+        estimatedEarning: formData.estimatedEarning,
+        referralLink: formData.referralLink,
+        seoTitle: formData.seoTitle,
+        seoDescription: formData.seoDescription,
+        projectInfo: formData.projectInfo,
+        airdropDetails: formData.airdropDetails,
+        participationGuide: formData.participationGuide,
+        earningMethods: formData.earningMethods,
+        projectMission: formData.projectMission,
+        faqs: formData.faqs,
+        socialRequirements: formData.socialRequirements
+      };
+      const platformId = await addPlatform(platformData);
       
       setSuccess('Platform added successfully!');
       
@@ -359,24 +454,258 @@ export default function AddPlatformPage() {
                 </div>
               </div>
 
-              {/* Generate Content Option */}
+              {/* Project Info */}
               <div className="sm:col-span-2">
-                <div className="flex items-center">
-                  <input
-                    id="generateContent"
-                    name="generateContent"
-                    type="checkbox"
-                    checked={generateContent}
-                    onChange={() => setGenerateContent(!generateContent)}
-                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                <label htmlFor="projectInfo" className="block text-sm font-medium leading-6 text-gray-900">
+                  What is {formData.name || 'the project'}? *
+                </label>
+                <div className="mt-2">
+                  <textarea
+                    id="projectInfo"
+                    name="projectInfo"
+                    rows={4}
+                    value={formData.projectInfo}
+                    onChange={handleChange}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    required
+                    placeholder="Describe what the project is about..."
                   />
-                  <label htmlFor="generateContent" className="ml-2 block text-sm text-gray-900">
-                    Automatically generate content with Gemini AI
-                  </label>
                 </div>
-                <p className="mt-1 text-sm text-gray-500">
-                  This will create a full article with intro, how it works, pros/cons, and FAQ
-                </p>
+              </div>
+              
+              {/* Airdrop Details */}
+              <div className="sm:col-span-2">
+                <label htmlFor="airdropDetails" className="block text-sm font-medium leading-6 text-gray-900">
+                  Airdrop Details *
+                </label>
+                <div className="mt-2">
+                  <textarea
+                    id="airdropDetails"
+                    name="airdropDetails"
+                    rows={4}
+                    value={formData.airdropDetails}
+                    onChange={handleChange}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    required
+                    placeholder="Provide details about the airdrop..."
+                  />
+                </div>
+              </div>
+              
+              {/* Participation Guide */}
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium leading-6 text-gray-900">
+                  Step-by-Step Guide: How to Participate *
+                </label>
+                <div className="mt-2 space-y-3">
+                  {formData.participationGuide.map((step, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <span className="flex-shrink-0 text-sm font-medium">{index + 1}.</span>
+                      <input
+                        type="text"
+                        value={step}
+                        onChange={(e) => handleArrayChange(index, 'participationGuide', e.target.value)}
+                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        placeholder={`Step ${index + 1}`}
+                      />
+                      {formData.participationGuide.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeArrayItem('participationGuide', index)}
+                          className="rounded-md bg-white p-1 text-gray-400 hover:text-red-500"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => addArrayItem('participationGuide')}
+                    className="mt-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-indigo-600 shadow-sm ring-1 ring-inset ring-indigo-300 hover:bg-indigo-50"
+                  >
+                    Add Step
+                  </button>
+                </div>
+              </div>
+              
+              {/* Earning Methods */}
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium leading-6 text-gray-900 mb-4">
+                  Earning Methods
+                </label>
+                
+                {/* Content Scouting */}
+                <div className="mb-4">
+                  <label htmlFor="earningMethods.contentScouting" className="block text-sm font-medium leading-6 text-gray-900">
+                    Content Scouting
+                  </label>
+                  <div className="mt-2">
+                    <textarea
+                      id="earningMethods.contentScouting"
+                      name="earningMethods.contentScouting"
+                      rows={3}
+                      value={formData.earningMethods.contentScouting}
+                      onChange={handleChange}
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      placeholder="Describe how users can earn through content scouting..."
+                    />
+                  </div>
+                </div>
+                
+                {/* Content Creation */}
+                <div className="mb-4">
+                  <label htmlFor="earningMethods.contentCreation" className="block text-sm font-medium leading-6 text-gray-900">
+                    Content Creation
+                  </label>
+                  <div className="mt-2">
+                    <textarea
+                      id="earningMethods.contentCreation"
+                      name="earningMethods.contentCreation"
+                      rows={3}
+                      value={formData.earningMethods.contentCreation}
+                      onChange={handleChange}
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      placeholder="Describe how users can earn through content creation..."
+                    />
+                  </div>
+                </div>
+                
+                {/* Self Scouting */}
+                <div>
+                  <label htmlFor="earningMethods.selfScouting" className="block text-sm font-medium leading-6 text-gray-900">
+                    Self Scouting
+                  </label>
+                  <div className="mt-2">
+                    <textarea
+                      id="earningMethods.selfScouting"
+                      name="earningMethods.selfScouting"
+                      rows={3}
+                      value={formData.earningMethods.selfScouting}
+                      onChange={handleChange}
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      placeholder="Describe how users can earn through self scouting..."
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Project Mission */}
+              <div className="sm:col-span-2">
+                <label htmlFor="projectMission" className="block text-sm font-medium leading-6 text-gray-900">
+                  Project Mission or Philosophy
+                </label>
+                <div className="mt-2">
+                  <textarea
+                    id="projectMission"
+                    name="projectMission"
+                    rows={3}
+                    value={formData.projectMission}
+                    onChange={handleChange}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    placeholder="Describe the project's mission or philosophy..."
+                  />
+                </div>
+              </div>
+              
+              {/* FAQs */}
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium leading-6 text-gray-900 mb-4">
+                  FAQs *
+                </label>
+                <div className="mt-2 space-y-4">
+                  {formData.faqs.map((faq, index) => (
+                    <div key={index} className="border border-gray-200 rounded-md p-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="text-sm font-medium">FAQ #{index + 1}</h4>
+                        {formData.faqs.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeArrayItem('faqs', index)}
+                            className="rounded-md bg-white p-1 text-gray-400 hover:text-red-500"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+                      <div className="mb-3">
+                        <label htmlFor={`faq-question-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
+                          Question
+                        </label>
+                        <input
+                          type="text"
+                          id={`faq-question-${index}`}
+                          value={faq.question}
+                          onChange={(e) => handleFaqChange(index, 'question', e.target.value)}
+                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                          placeholder="Enter question"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor={`faq-answer-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
+                          Answer
+                        </label>
+                        <textarea
+                          id={`faq-answer-${index}`}
+                          value={faq.answer}
+                          onChange={(e) => handleFaqChange(index, 'answer', e.target.value)}
+                          rows={3}
+                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                          placeholder="Enter answer"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => addArrayItem('faqs')}
+                    className="mt-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-indigo-600 shadow-sm ring-1 ring-inset ring-indigo-300 hover:bg-indigo-50"
+                  >
+                    Add FAQ
+                  </button>
+                </div>
+              </div>
+              
+              {/* Social Requirements */}
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium leading-6 text-gray-900">
+                  Social Requirements
+                </label>
+                <div className="mt-2 space-y-3">
+                  {formData.socialRequirements.map((req, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={req}
+                        onChange={(e) => handleArrayChange(index, 'socialRequirements', e.target.value)}
+                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        placeholder="E.g., Twitter follow, Telegram join, etc."
+                      />
+                      {formData.socialRequirements.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeArrayItem('socialRequirements', index)}
+                          className="rounded-md bg-white p-1 text-gray-400 hover:text-red-500"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => addArrayItem('socialRequirements')}
+                    className="mt-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-indigo-600 shadow-sm ring-1 ring-inset ring-indigo-300 hover:bg-indigo-50"
+                  >
+                    Add Requirement
+                  </button>
+                </div>
               </div>
             </div>
           </div>

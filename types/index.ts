@@ -12,24 +12,24 @@ export interface Platform {
   seoDescription: string;
   createdAt: any;
   updatedAt: any;
-}
-
-export interface GeneratedContent {
-  platformId: string;
-  intro: string;
-  howItWorks: string;
-  prosAndCons: {
-    pros: string[];
-    cons: string[];
+  // New manual content fields
+  projectInfo: string;
+  airdropDetails: string;
+  participationGuide: string[];
+  earningMethods: {
+    contentScouting: string;
+    contentCreation: string;
+    selfScouting: string;
   };
-  estimatedEarnings: string;
-  faq: {
+  projectMission: string;
+  faqs: {
     question: string;
     answer: string;
   }[];
-  createdAt: any;
-  updatedAt: any;
+  socialRequirements: string[];
 }
+
+// Removed GeneratedContent interface as it's no longer needed
 
 export interface Category {
   id: string;

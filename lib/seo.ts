@@ -1,6 +1,6 @@
-import { Platform, GeneratedContent } from '../types';
+import { Platform } from '../types';
 
-export function generateStructuredData(platform: Platform, content?: GeneratedContent) {
+export function generateStructuredData(platform: Platform) {
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -16,11 +16,11 @@ export function generateStructuredData(platform: Platform, content?: GeneratedCo
   };
 
   // Add FAQ if available
-  if (content?.faq && content.faq.length > 0) {
+  if (platform.faqs && platform.faqs.length > 0) {
     const faqStructuredData = {
       '@context': 'https://schema.org',
       '@type': 'FAQPage',
-      mainEntity: content.faq.map(item => ({
+      mainEntity: platform.faqs.map(item => ({
         '@type': 'Question',
         name: item.question,
         acceptedAnswer: {
